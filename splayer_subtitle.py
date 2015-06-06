@@ -28,7 +28,7 @@ def hash_video(filename):
 
 class Splayer_subtitle(object):
     __url = "https://www.shooter.cn/api/subapi.php"
-    __path = "/tmp"
+    __path = None
     def __init__(self, url = None, path = None, format = "json", lang = "Chn", hash_func = hash_video):
         self.url = self.__url if url is None else url
         self.path = self.__path if path is None else path
@@ -39,6 +39,8 @@ class Splayer_subtitle(object):
 
     def setfile(self, filename):
         self.filename = filename
+        if self.path is None:
+            self.path = os.path.dirname(filename)
         self.params['pathinfo'] = os.path.basename(filename)
 
     def hash_video(self):
@@ -86,8 +88,7 @@ def fetch_subtitle(filename, index = 0):
     return splayer_subtitle.fetch_subtitle_cand(index)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "Please provide at least 1 video file"
+    if len(sys.argv) != 2:
+        print "Please provide at least exactly 1 video file"
         sys.exit(6)
-    for i in range(1, len(sys.argv)):
-        print fetch_subtitle(sys.argv[i])
+    subtitle = fetch_subtitle(sys.argv[1])
