@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# _*_ coding:utf8 _*_
+# -*- coding:utf8 -*-
 
 from urllib2 import Request, urlopen
 from urllib import urlencode, urlretrieve
