@@ -57,7 +57,7 @@ class Splayer_subtitle(object):
 
     def fetch_subtitle_list(self):
         self.subtitles = json.loads(urlopen(self.request).readlines()[0])
-
+ 
     def fetch_subtitle_cand(self, index = 0):
         if len(self.subtitles) <= index:
             print "No subtitle candidate"
@@ -69,26 +69,34 @@ class Splayer_subtitle(object):
         subinfo = {}
         for i in ['Desc', 'Delay']:
             subinfo[i] = subtitle[i]
-        subinfo['filename'] = os.path.join(self.path, self.params['pathinfo'] + "." + subtitle['Files'][0]['Ext'])
-        try:
-            print "try fetching Subtle file to "+subinfo['filename']
-            print 'target url:: ' + subtitle['Files'][0]['Link']
-            urlretrieve(subtitle['Files'][0]['Link'], subinfo['filename'])
-        except Exception as e:
-            print e
-            sys.exit(4)
-        print "Successfully downloaded subtitle file: " + subinfo['filename']
+        for i in range(len(subtitle['Files'])):
+            subinfo['filename'] = os.path.join(self.path, self.params['pathinfo'] + "." + subtitle['Files'][i]['Ext'])
+            try:
+                print "try fetching Subtle file to "+subinfo['filename']
+                print 'target url:: ' + subtitle['Files'][0]['Link']
+                urlretrieve(subtitle['Files'][i]['Link'], subinfo['filename'])
+            except Exception as e:
+                print e
+                sys.exit(4)
+            print "Successfully downloaded subtitle file: " + subinfo['filename']
         return subinfo
 
-def fetch_subtitle(filename, index = 0):
+def fetch_subtitle(filename):
     splayer_subtitle = Splayer_subtitle()
     splayer_subtitle.setfile(filename)
     splayer_subtitle.make_request()
     splayer_subtitle.fetch_subtitle_list()
+    for i, s in enumerate(splayer_subtitle.subtitles):
+        print i, ": Delay = ", s["Delay"], " and extension = ", s['Files'][0]['Ext']
+    if len(splayer_subtitle.subtitles) == 1:
+        index = 0
+    else:
+        index = int(raw_input("Your choice: "))
     return splayer_subtitle.fetch_subtitle_cand(index)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Please provide at least exactly 1 video file"
+        print "Please provide at exactly 1 video file"
         sys.exit(6)
     subtitle = fetch_subtitle(sys.argv[1])
+    print subtitle
